@@ -22,9 +22,7 @@
   #feedback { margin: 20px; font-size: 1.3em; min-height: 40px; }
   .correct { color: #00ff99; }
   .wrong { color: #ff4d6d; }
-  #symbols {
-    margin: 20px 0;
-  }
+  #symbols { margin: 20px 0; }
   .symbol {
     display: inline-block;
     margin: 5px; padding: 10px 15px;
@@ -67,14 +65,38 @@
 <audio id="applause" src="https://www.soundjay.com/human/applause-8.mp3"></audio>
 
 <script>
-const questions = [
-  {q: "(x + 2)(x + 3)", a: "x^2+5x+6"},
+// Extended & varied question set
+let questions = [
+  {q: "Expand: (x + 2)(x + 3)", a: "x^2+5x+6"},
   {q: "Expand: 2(x + 4)", a: "2x+8"},
   {q: "Simplify: 3x + 4x", a: "7x"},
   {q: "Factorise: x^2 + 5x + 6", a: "(x+2)(x+3)"},
   {q: "Simplify: 2x + 3x - x", a: "4x"},
+  {q: "Expand: (x + 5)^2", a: "x^2+10x+25"},
+  {q: "Simplify: 6a - 2a + 4", a: "4a+4"},
+  {q: "Expand: (2x)(3x)", a: "6x^2"},
+  {q: "Factorise: x^2 - 9", a: "(x-3)(x+3)"},
+  {q: "Simplify: (x+x+x)", a: "3x"},
+  {q: "Expand: (x - 4)(x + 4)", a: "x^2-16"},
+  {q: "Factorise: 2x+6", a: "2(x+3)"},
+  {q: "Simplify: 5y + 7y - 2y", a: "10y"},
+  {q: "Expand: (3x + 2)(x)", a: "3x^2+2x"},
+  {q: "Factorise: x^2 + 7x + 10", a: "(x+2)(x+5)"},
+  {q: "Expand: (x - 2)^2", a: "x^2-4x+4"},
+  {q: "Simplify: 8m - 3m + 6", a: "5m+6"},
+  {q: "Factorise: x^2 - 4x + 4", a: "(x-2)(x-2)"},
+  {q: "Expand: (x + 1)(x + 7)", a: "x^2+8x+7"},
+  {q: "Simplify: 12a + 5a - 7", a: "17a-7"},
+  {q: "Expand: (y + 2)(y - 2)", a: "y^2-4"},
+  {q: "Factorise: y^2 + 6y + 9", a: "(y+3)(y+3)"}
 ];
+
 let index = 0;
+
+// Shuffle questions
+function shuffle(arr) {
+  return arr.sort(()=>Math.random()-0.5);
+}
 
 function normalise(expr) {
   return expr.replace(/\s+/g, "")
@@ -85,7 +107,10 @@ function normalise(expr) {
 }
 
 function newQuestion() {
-  if (index >= questions.length) index = 0;
+  if (index >= questions.length) {
+    index = 0; // restart when finished
+    questions = shuffle(questions);
+  }
   document.getElementById("question").textContent = questions[index].q;
   document.getElementById("answer-input").value = "";
   document.getElementById("feedback").textContent = "";
@@ -124,11 +149,13 @@ function launchFireworks() {
   }
 }
 
+// Answer on Enter
 document.getElementById("answer-input")
   .addEventListener("keydown", e => {
     if (e.key === "Enter") checkAnswer();
   });
 
+// Click to insert symbols
 document.querySelectorAll(".symbol").forEach(sym=>{
   sym.addEventListener("click", ()=>{
     const input = document.getElementById("answer-input");
@@ -137,11 +164,18 @@ document.querySelectorAll(".symbol").forEach(sym=>{
   });
 });
 
+// Restart game
 document.getElementById("restart").onclick = ()=>{
-  index = 0; newQuestion();
+  index = 0;
+  questions = shuffle(questions);
+  newQuestion();
 };
 
+// Start game
+questions = shuffle(questions);
 newQuestion();
 </script>
 </body>
 </html>
+
+
