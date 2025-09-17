@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algebra Practice Game</title>
+<style>
+  body {
+    margin: 0; padding: 0;
+    font-family: "Comic Sans MS", sans-serif;
+    background: linear-gradient(to bottom, #1e1e2f, #121212);
+    color: white; text-align: center;
+    height: 100vh; overflow: hidden;
+  }
+  h1 { color: #ffdd57; margin: 20px 0; }
+  #question { font-size: 2em; margin: 20px 0; color: #00eaff; }
+  #answer-input {
+    font-size: 1.5em; padding: 10px;
+    width: 60%; border-radius: 10px; border: none;
+    text-align: center;
+  }
+  #feedback { margin: 20px; font-size: 1.3em; min-height: 40px; }
+  .correct { color: #00ff99; }
+  .wrong { color: #ff4d6d; }
+  #symbols {
+    margin: 20px 0;
+  }
+  .symbol {
+    display: inline-block;
+    margin: 5px; padding: 10px 15px;
+    font-size: 1.5em; background: #333; color: #fff;
+    border-radius: 8px; cursor: pointer;
+    user-select: none;
+  }
+  #restart {
+    margin: 15px; padding: 10px 20px;
+    font-size: 1em; background: #ff4d6d; color: white;
+    border: none; border-radius: 8px; cursor: pointer;
+  }
+  .spark {
+    position: absolute; width: 12px; height: 12px;
+    border-radius: 50%; pointer-events: none;
+    animation: explode 1.5s forwards;
+  }
+  @keyframes explode {
+    from { transform: translate(0,0) scale(1); opacity:1; }
+    to { transform: translate(var(--x), var(--y)) scale(0.3); opacity:0; }
+  }
+</style>
+</head>
+<body>
+<h1>🎆 Algebra Practice Game 🎆</h1>
+<div id="question">?</div>
+<input id="answer-input" placeholder="Type your answer here">
+<div id="symbols">
+  <span class="symbol">+</span>
+  <span class="symbol">-</span>
+  <span class="symbol">×</span>
+  <span class="symbol">÷</span>
+  <span class="symbol">(</span>
+  <span class="symbol">)</span>
+  <span class="symbol">^</span>
+</div>
+<div id="feedback"></div>
+<button id="restart">🔄 Restart</button>
+
+<audio id="applause" src="https://www.soundjay.com/human/applause-8.mp3"></audio>
+
+<script>
+const questions = [
+  {q: "(x + 2)(x + 3)", a: "x^2+5x+6"},
+  {q: "Expand: 2(x + 4)", a: "2x+8"},
+  {q: "Simplify: 3x + 4x", a: "7x"},
+  {q: "Factorise: x^2 + 5x + 6", a: "(x+2)(x+3)"},
+  {q: "Simplify: 2x + 3x - x", a: "4x"},
+];
+let index = 0;
+
+function normalise(expr) {
+  return expr.replace(/\s+/g, "")
+             .replace(/×/g,"*")
+             .replace(/÷/g,"/")
+             .replace(/\*\*/g,"^")
+             .toLowerCase();
+}
+
+function newQuestion() {
+  if (index >= questions.length) index = 0;
+  document.getElementById("question").textContent = questions[index].q;
+  document.getElementById("answer-input").value = "";
+  document.getElementById("feedback").textContent = "";
+}
+
+function checkAnswer() {
+  let userAns = normalise(document.getElementById("answer-input").value);
+  let correctAns = normalise(questions[index].a);
+  if (userAns === correctAns) {
+    document.getElementById("feedback").textContent = "🎉 Correct!";
+    document.getElementById("feedback").className = "correct";
+    launchFireworks();
+    document.getElementById("applause").play();
+    setTimeout(()=>{ index++; newQuestion(); },2000);
+  } else {
+    document.getElementById("feedback").textContent =
+      "❌ Incorrect. Correct answer: " + questions[index].a;
+    document.getElementById("feedback").className = "wrong";
+    setTimeout(()=>{ index++; newQuestion(); },3000);
+  }
+}
+
+function launchFireworks() {
+  for (let i = 0; i < 50; i++) {
+    const spark = document.createElement("div");
+    spark.className = "spark";
+    const angle = Math.random() * 2 * Math.PI;
+    const dist = Math.random() * 200 + 50;
+    spark.style.setProperty("--x", `${Math.cos(angle)*dist}px`);
+    spark.style.setProperty("--y", `${Math.sin(angle)*dist}px`);
+    spark.style.left = window.innerWidth/2 + "px";
+    spark.style.top = window.innerHeight/3 + "px";
+    spark.style.background = `hsl(${Math.random()*360},100%,60%)`;
+    document.body.appendChild(spark);
+    setTimeout(()=>spark.remove(),1500);
+  }
+}
+
+document.getElementById("answer-input")
+  .addEventListener("keydown", e => {
+    if (e.key === "Enter") checkAnswer();
+  });
+
+document.querySelectorAll(".symbol").forEach(sym=>{
+  sym.addEventListener("click", ()=>{
+    const input = document.getElementById("answer-input");
+    input.value += sym.textContent;
+    input.focus();
+  });
+});
+
+document.getElementById("restart").onclick = ()=>{
+  index = 0; newQuestion();
+};
+
+newQuestion();
+</script>
+</body>
+</html>
